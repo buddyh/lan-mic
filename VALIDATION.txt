@@ -70,7 +70,9 @@ Not yet verified / required before broad release
   microphone. Sending from Linux needs a selected/connected local microphone.
 - Two separate Linux computers, additional compositors, USB hot-plug during a
   call, long-running soak tests, and physical listening-quality checks.
-- CI configuration is supplied but has not run on a hosted service.
+- Hosted CI passed on Linux and Mac. Release-package jobs also passed on Linux
+  x86_64, Mac Apple Silicon and Mac Intel, including source and binary privacy
+  checks. Run: https://github.com/buddyh/lan-mic/actions/runs/43075328538
 - Developer ID signing/notarized app distribution and fresh-account first-launch
   setup still require release verification. The project is GPL-3.0-or-later.
   Public repository and release status should be checked on GitHub directly.
@@ -91,3 +93,8 @@ Open-source preparation checks
 - Author credit and public repository metadata are intentional. No personal email
   is included in project-authored source. Required upstream legal notices retain
   their original public copyright credits/contact information.
+
+Archive metadata
+Linux package generation normalizes owner/group to numeric root (0:0), so local
+release archives do not expose the builder’s login name. Public CI artifacts use
+GitHub-hosted runner accounts; installed runtime state is never packaged.

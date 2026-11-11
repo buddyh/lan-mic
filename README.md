@@ -1,5 +1,7 @@
 # Lan Mic
 
+[![Rust checks](https://github.com/buddyh/lan-mic/actions/workflows/ci.yml/badge.svg)](https://github.com/buddyh/lan-mic/actions/workflows/ci.yml)
+
 Your microphone follows your keyboard and mouse between computers.
 
 Lan Mic is a Rust companion to [LAN Mouse](https://github.com/feschber/lan-mouse).
@@ -285,9 +287,9 @@ python3 tests/system_linux.py --binary "$PWD/target/release/lan-mic"
 
 The live test pauses/restores `lan-mic.service`, uses generated audio and private
 fixture logs, and verifies Linux ↔ Linux audio/default restoration/disconnect.
-It never edits LAN Mouse's real log or records a real microphone. CI configuration
-runs Rust checks on Linux and Mac; it is supplied but has not run on a hosted CI
-service yet. Native hardware and OS permissions cannot be certified by unit tests.
+It never edits LAN Mouse's real log or records a real microphone. Hosted CI passes
+Rust checks on Linux and Mac, and release packages are built for Linux x86_64,
+Apple Silicon and Intel Mac. Native hardware and OS permissions cannot be certified by unit tests.
 
 The adapter currently follows LAN Mouse logs because its public IPC lacks a complete
 focus-change event stream. A future upstream integration should replace this with
