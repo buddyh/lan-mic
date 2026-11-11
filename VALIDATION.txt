@@ -1,0 +1,93 @@
+Lan Mic 0.3.0 validation — 2026-11-11
+
+Automated checks passed
+- Linux: 20 unit tests and 1 executable full-duplex relay regression test.
+- Native Apple Silicon Mac: 14 shared unit tests and 1 relay regression test.
+- cargo clippy --locked --all-targets -- -D warnings: passed on both platforms.
+- Native release builds: passed on Linux x86_64 and macOS aarch64.
+- Shell syntax checks: both installers and both uninstall scripts.
+- Linux doctor and peers commands tested against the real running services.
+
+Coverage
+- Confirmed handoff, duplicate/late acknowledgements, other peer, release,
+  selected-peer connection closure, restart and log rotation without replay.
+- Persisted menu-bar display mode and both directions of name/platform labels.
+- One-time star prompt eligibility, idle/foreground gating and persisted dismissal.
+- Late recording streams on the former default follow an active handoff once;
+  subsequent manual stream/default changes are preserved.
+- Recording/default restoration, new recording streams, manual changes and
+  recovery of a saved route after a crash.
+- Feedback-source rejection, arbitrary frame boundaries, invalid/oversized
+  frames, bounded decoder memory and full-duplex relay flush without newlines.
+- Stereo downmix, clipping and 44.1 -> 48 kHz pitch preservation.
+
+Live Linux ↔ Linux test passed
+Two real Rust agents on one Linux host, private fixture handoff logs, a local
+full-duplex relay, generated 440 Hz audio, real parec/pacat and PipeWire sources.
+Latest run:
+  Alpha -> Beta: 67,584 samples; RMS 3481.4
+  Beta -> Alpha: 63,488 samples; RMS 3535.1
+Returning focus restored the original recording input. Cutting the transport
+during active forwarding restored the original default and muted the virtual
+microphone. Default speakers were preserved. The production service resumed.
+No real microphone was recorded; the fixture microphone contains only a tone.
+This validates the Linux endpoint implementation in both roles, not hardware
+interoperability across two separate Linux computers/compositors.
+
+Mac UI checks passed on the development Mac
+- Native window visible with actual RØDE PodMic USB and named Linux peer.
+- Real native buttons exposed to macOS Accessibility; About button opened the
+  separate About Lan Mic window.
+- Menu bar labels popup changed Computer names -> Mac / Linux and wrote the
+  preference. Restarting the helper preserved the Platforms selection.
+- Main window reopening works. The original Computer names selection was
+  restored after verifying Platforms persistence through helper restart.
+- Installer stops Finder-owned instances and retries transient launchd loading;
+  app/settings backups are retained before replacement.
+- Audio runs on a dedicated thread, separate from AppKit event tracking.
+- Settings window and author credit are present in the installed native app.
+- The user enabled microphone permission after the rebuilt preview was installed.
+
+Existing Mac -> Linux evidence
+The previous Rust build passed synthetic Mac tone -> Rust relay -> encrypted
+SSH -> Rust receiver -> Linux virtual microphone (176,640 samples, RMS 3190.5),
+with route restoration and idle mute. The user reported the audio working.
+The current build was used with real Mac microphone -> Linux -> Codex dictation.
+A live capture trace showed new dictation streams opening on a cached former
+input after handoff. The Linux endpoint now follows those newly opened streams;
+the user confirmed dictation working after the fix was installed.
+The short diagnostic meter kept only sample count/RMS/peak, not audio files.
+
+Not yet verified / required before broad release
+- Linux -> Mac hardware audio: BlackHole 2ch was installed from the official
+  package, checksum/signature/notarization verified. The Mac has restarted and
+  the driver is now detected. Actual end-to-end receive audio still needs testing.
+  A reverse-path fixture did not pass: the default switched briefly but returned
+  to the physical input, and a separate CLI BlackHole capture probe read silence.
+  CLI microphone permissions/probe behavior and default-route behavior remain
+  unresolved. Do not treat status=receiving as verified usable Mac audio.
+- This Linux computer currently defaults to a speaker monitor, not a physical
+  microphone. Sending from Linux needs a selected/connected local microphone.
+- Two separate Linux computers, additional compositors, USB hot-plug during a
+  call, long-running soak tests, and physical listening-quality checks.
+- CI configuration is supplied but has not run on a hosted service.
+- Developer ID signing/notarized app distribution and fresh-account first-launch
+  setup still require release verification. The project is GPL-3.0-or-later.
+  Public repository and release status should be checked on GitHub directly.
+
+Startup state after installation
+Both LAN Mouse daemons use compatible upstream commit 69958c62. Existing SSH
+host/key trust is reused. Local audio/UI sockets are private to the user.
+Inactive/disconnected received sources are silent and previous defaults are
+preserved. README.md is the current setup and troubleshooting reference.
+
+Open-source preparation checks
+- Source privacy scan passed. Runtime configurations, logs, recordings, backups,
+  retired prototypes and build outputs are excluded from the source package.
+- Release binaries are built with remapped checkout/home paths and scanned.
+- Dependency notices collected for all 121 third-party lockfile packages.
+- cargo-audit 0.23.0: 122 lockfile packages, no vulnerabilities or warnings,
+  RustSec database commit fd6f39814c4d3c359fdbe223d0280dec4933f78f, checked 2026-11-11.
+- Author credit and public repository metadata are intentional. No personal email
+  is included in project-authored source. Required upstream legal notices retain
+  their original public copyright credits/contact information.

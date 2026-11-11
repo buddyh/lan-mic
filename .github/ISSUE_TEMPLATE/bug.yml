@@ -1,0 +1,26 @@
+name: Bug report
+description: Report a reproducible setup, audio, or handoff problem.
+body:
+  - type: markdown
+    attributes:
+      value: Do not include audio recordings, keys, certificates, real hostnames, IPs, usernames, or private paths. Redact diagnostics. Report vulnerabilities privately as described in SECURITY.md.
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: OS versions, CPU types, Lan Mic version, LAN Mouse builds, and audio backend. Use fictional computer names.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps and observed behavior
+      description: Include direction, expected behavior, and whether return or disconnect restores the previous input.
+    validations:
+      required: true
+  - type: textarea
+    id: diagnostics
+    attributes:
+      label: Redacted diagnostics
+      description: Relevant doctor output or short log excerpt, reviewed for private details.
+      render: text

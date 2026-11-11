@@ -1,0 +1,60 @@
+name: Package release
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  package:
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-22.04
+            package: linux-x86_64
+          - os: macos-15
+            package: macos-arm64
+          - os: macos-15-intel
+            package: macos-intel
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@1.95.0
+        with:
+          components: rustfmt, clippy
+      - run: cargo fmt --check
+      - run: cargo test --locked
+      - run: cargo clippy --locked --all-targets -- -D warnings
+      - run: python3 scripts/check-privacy.py
+      - run: scripts/build-release.sh
+      - run: python3 scripts/check-privacy.py --binary target/release/lan-mic
+      - if: runner.os == 'macOS'
+        run: scripts/package-mac.sh "$PWD/target/release/lan-mic"
+      - if: runner.os == 'Linux'
+        run: scripts/package-linux.sh "$PWD/target/release/lan-mic"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lan-mic-${{ matrix.package }}
+          path: dist/*
+          if-no-files-found: error
+  draft:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: package
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+      - name: Include exact source and combined checksums
+        run: |
+          git archive --format=tar.gz --prefix=lan-mic-source/ HEAD > dist/lan-mic-source.tar.gz
+          cd dist
+          sha256sum *.zip *.tar.gz > SHA256SUMS.txt
+      - name: Create reviewable prerelease draft
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" dist/* --draft --prerelease --generate-notes --title "Lan Mic $GITHUB_REF_NAME"

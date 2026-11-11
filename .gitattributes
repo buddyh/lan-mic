@@ -1,0 +1,3 @@
+* text=auto
+# Preserve upstream legal notices verbatim, including their whitespace.
+THIRD_PARTY_LICENSES/** -whitespace

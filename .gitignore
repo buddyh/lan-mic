@@ -1,0 +1,16 @@
+/target/
+/dist/
+/legacy/
+/.DS_Store
+**/__pycache__/
+*.pyc
+# Runtime files and credentials never belong in the source repository.
+*.log
+*.sock
+*.pem
+*.key
+/config.json
+/status.json
+/route.json
+/input-route.json
+/.env
